@@ -1,10 +1,9 @@
 #!/bin/bash
 
-if [[ $1 = "" ]]; then
-	echo "try emu help"
-	exit
-elif [[ $1 = "help" ]]; then
-        echo "emu [hda] [cdrom] [mem (optional)] [smp (optional)] - start qemu"
+
+if [[ $1 = "help" ]]; then
+	echo "emu cont [hda] [mem (optional)] [smp [optional]] - start qemu without iso"
+	echo "emu start [hda] [cdrom] [mem (optional)] [smp (optional)] - start qemu"
 	echo "emu create [name] [size] - create img file"
 elif [[ $1 = "create" ]]; then
 	if [[ -z $2 || -z $3 ]]; then
@@ -12,17 +11,44 @@ elif [[ $1 = "create" ]]; then
 	else
         	qemu-img create "$2" "$3"
 	fi
-else
-	if [[ -z $3 ]]; then
+elif [[ $1 = "start" ]]; then
+	if [[ -z $2 || -z $3 ]]; then
+                echo "emu start [hda] [cdrom] [mem (optional)] [smp (optional)] - start qemu"
+        else
+                qemu-img create "$2" "$3"
+        fi
+	if [[ -z $4 ]]; then
 		mem="4G"
 	else
-		mem="$3"
+		mem="$4"
 	fi
-	if [[ -z $4 ]]; then
+	if [[ -z $5 ]]; then
 		smp="4"
 	else
-		smp="$4"
+		smp="$5"
 	fi
+	
+	qemu-system-x86_64 -hda "$2" -cdrom "$3" -m "$mem" -smp "$smp" -accel kvm
+elif [[ $1 = "cont" ]]; then
+	if [[ -z $2 || -z $3 ]]; then
+                echo "emu cont [hda] [mem (optional)] [smp [optional]] - start qemu without iso"
+        else
+                qemu-img create "$2" "$3"
+        fi
+	if [[ -z $3 ]]; then
+                mem="4G"
+        else
+                mem="$3"
+        fi
+        if [[ -z $4 ]]; then
+                smp="4"
+        else
+                smp="$4"
+        fi
 
-	qemu-system-x86_64 -hda "$1" -cdrom "$2" -m $mem -smp $smp -accel kvm
+        qemu-system-x86_64 -hda "$2" -m "$mem" -smp "$smp" -accel kvm
+
+else
+        echo "try emu help"
+        exit
 fi
