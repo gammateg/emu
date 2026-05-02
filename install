@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+echo "installation start"
+
+USERCOM_DIR="$HOME/usercom"
+mkdir -p "$USERCOM_DIR"
+mv emu "$USERCOM_DIR/emu"
+chmod 755 "$USERCOM_DIR/emu"
+
+grep -q "usercom" "$HOME/.bashrc" || echo "export PATH=\"$USERCOM_DIR:\$PATH\"" >> "$HOME/.bashrc"
+
+echo "installed"
