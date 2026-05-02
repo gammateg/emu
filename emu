@@ -1,21 +1,28 @@
 #!/bin/bash
 
-if [ "$1" = "" ]; then
-        echo "try emu help"
-        exit
-elif [ "$1" = "help" ]; then
-        echo "emu [hda] [cdrom] [mem (optional)] [smp (optional)]"
+if [[ $1 = "" ]]; then
+	echo "try emu help"
+	exit
+elif [[ $1 = "help" ]]; then
+        echo "emu [hda] [cdrom] [mem (optional)] [smp (optional)] - start qemu"
+	echo "emu create [name] [size] - create img file"
+elif [[ $1 = "create" ]]; then
+	if [[ -z $2 || -z $3 ]]; then
+                echo "emu create [name] [size] - create img file"
+	else
+        	qemu-img create "$2" "$3"
+	fi
 else
-        if [ -z "$3" ]; then
-                mem="4G"
-        else
-                mem="$3"
-        fi
-        if [ -z "$4" ]; then
-                smp="4"
-        else
-                smp="$4"
-        fi
+	if [[ -z $3 ]]; then
+		mem="4G"
+	else
+		mem="$3"
+	fi
+	if [[ -z $4 ]]; then
+		smp="4"
+	else
+		smp="$4"
+	fi
 
-        qemu-system-x86_64 -hda $1 -cdrom $2 -m $mem -smp $smp -accel kvm
+	qemu-system-x86_64 -hda "$1" -cdrom "$2" -m $mem -smp $smp -accel kvm
 fi
